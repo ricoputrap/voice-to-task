@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react'
 import { Request, Task } from '../types';
 import { useRouter } from 'next/navigation';
-import { CheckCircle, ChevronLeft, RotateCcw, Send, XCircle } from 'lucide-react';
+import { CheckCircle, ChevronLeft, Mic, RotateCcw, Send, XCircle } from 'lucide-react';
 
 
 const initialTask: Task = {
@@ -76,6 +76,84 @@ export default function NewRequestPage() {
     setStatusMessage('');
   };
 
+    // --- Voice Recording Logic ---
+
+  const startRecording = async (): Promise<void> => {
+    setError(null);
+    setStatusMessage('Listening...');
+    setTask(initialTask); // Clear previous task
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event: BlobEvent) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        stream.getTracks().forEach(track => track.stop());
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        processAudio(audioBlob);
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      setError('Failed to access microphone. Please check permissions.');
+      setStatusMessage('');
+      setIsRecording(false);
+    }
+  };
+
+  const stopRecording = (): void => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      setStatusMessage('Processing audio...');
+    }
+  };
+
+  const processAudio = async (audioBlob: Blob): Promise<void> => {
+    setIsLoading(true);
+    setStatusMessage('Transcribing and classifying task details...');
+    
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'voice_memo.webm');
+
+    try {
+      // API call to Next.js route
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json();
+        throw new Error(errorBody.error || `Server error: ${response.statusText}`);
+      }
+
+      const result: { success: boolean, task?: Task, error?: string } = await response.json();
+      
+      if (result.success && result.task) {
+        setTask(result.task);
+        setStatusMessage('Task details filled automatically!');
+      } else {
+         setError(result.error || 'Failed to extract structured task data.');
+         setStatusMessage('');
+      }
+
+    } catch (err: any) {
+      console.error('API Error:', err);
+      setError(`An error occurred: ${err.message}.`);
+      setStatusMessage('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-gray-50">
       {/* Header */}
@@ -121,7 +199,7 @@ export default function NewRequestPage() {
             <p className="text-sm text-gray-500">
               Hold to speak your request:
             </p>
-          {/* <button
+          <button
             onMouseDown={startRecording}
             onMouseUp={stopRecording}
             onTouchStart={startRecording}
@@ -138,8 +216,8 @@ export default function NewRequestPage() {
             `}
             title={isRecording ? 'Release to stop recording' : 'Hold to record task'}
           >
-            <Mic className={`w-7 h-7 ${isRecording ? 'animate-pulse' : ''}`} />
-          </button> */}
+            <Mic  className={`w-7 h-7 ${isRecording ? 'animate-pulse' : ''}`} />
+          </button>
           <p className="text-xs text-gray-400">
               {isRecording ? 'RECORDING...' : 'Press and Hold'}
           </p>
@@ -163,11 +241,6 @@ export default function NewRequestPage() {
                   <option key={dept} value={dept}>{dept}</option>
                 ))}
               </select>
-              {task.category && (
-                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${color.bg} ${color.text}`}>
-                  {task.category}
-                </span>
-              )}
             </div>
           </div>
 
