@@ -15,7 +15,7 @@ function RequestsPage() {
   return (
     <main className="flex flex-col h-screen max-w-md mx-auto">
       <h1 className="text-3xl font-extrabold text-gray-900 text-center p-4 bg-white border-b shadow-sm">
-        Requests ({tasks.filter(t => t.status !== 'DONE').length})
+        Requests ({tasks.length})
       </h1>
       <div className="flex-1 overflow-y-auto bg-gray-100">
         {tasks.map(request => (
