@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Plus } from 'lucide-react';
 import RequestItem from './request-item';
 import mockRequests from './data';
-import { Request } from './types';
+import { Request } from '../types';
 import { useRouter } from 'next/navigation';
 
 

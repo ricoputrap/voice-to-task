@@ -1,4 +1,4 @@
-import { Request } from "./types";
+import { Request } from "../types";
 
 const mockRequests: Request[] = [
   { id: 1, room: '103', category: 'Housekeeping', title: 'Request for Extra Pillows', status: 'TODO', assignee: 'Alex', dueTime: '8:00 PM' },

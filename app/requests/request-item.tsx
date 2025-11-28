@@ -1,34 +1,14 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { Request, Task } from './types';
+import { Request, Task } from '../types';
 
-interface DepartmentColorConfig {
-  bg: string;
-  text: string;
-  border: string;
-}
 
 // --- Global Mock Data & Utilities ---
 
-const initialTask: Task = {
-  room: '',
-  category: '',
-  title: '',
-  assignee: '',
-  dueTime: '',
-};
 
-const departmentColors: Record<string, DepartmentColorConfig> = {
-  Housekeeping: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-500' },
-  Engineering: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-500' },
-  Concierge: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-500' },
-  'Front Desk': { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-500' },
-  Other: { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-500' },
-};
 
 const RequestItem: React.FC<{ request: Request }> = ({ request }) => {
-  const color = departmentColors[request.category] || departmentColors['Other'];
   return (
     <div className="flex justify-between items-start p-4 bg-white hover:bg-gray-50 border-b border-gray-200">
       <div className="flex-1 min-w-0">
