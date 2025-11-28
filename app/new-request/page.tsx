@@ -14,19 +14,7 @@ const initialTask: Task = {
   dueTime: '',
 };
 
-interface DepartmentColorConfig {
-  bg: string;
-  text: string;
-  border: string;
-}
-
-const departmentColors: Record<string, DepartmentColorConfig> = {
-  Housekeeping: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-500' },
-  Engineering: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-500' },
-  Concierge: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-500' },
-  'Front Desk': { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-500' },
-  Other: { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-500' },
-};
+const DEPARTMENTS = ['Housekeeping', 'Engineering', 'Concierge', 'Front Desk'];
 
 export default function NewRequestPage() {
   const [task, setTask] = useState<Task>(initialTask);
@@ -40,9 +28,6 @@ export default function NewRequestPage() {
   const audioChunksRef = useRef<Blob[]>([]);
 
   const router = useRouter();
-
-  const currentCategory = task.category || 'Other';
-  const color = departmentColors[currentCategory] || departmentColors['Other'];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
       const { id, value } = e.target;
@@ -216,7 +201,7 @@ export default function NewRequestPage() {
             `}
             title={isRecording ? 'Release to stop recording' : 'Hold to record task'}
           >
-            <Mic  className={`w-7 h-7 ${isRecording ? 'animate-pulse' : ''}`} />
+            <Mic  className={`w-7 h-7 ${isRecording ? 'animate-pulse' : ''}`} />
           </button>
           <p className="text-xs text-gray-400">
               {isRecording ? 'RECORDING...' : 'Press and Hold'}
@@ -234,14 +219,12 @@ export default function NewRequestPage() {
           {/* Category (Department) */}
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
-            <div className="mt-1 flex items-center space-x-3">
-              <select id="category" value={task.category} onChange={handleInputChange} className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border text-gray-900" required>
-                <option value="">Select Department</option>
-                {Object.keys(departmentColors).filter(d => d !== 'Other').map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
-            </div>
+            <select id="category" value={task.category} onChange={handleInputChange} className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border text-gray-900 placeholder-gray-400" required>
+              <option value="">Select Department</option>
+              {DEPARTMENTS.map(dept => (
+                <option key={dept} value={dept}>{dept}</option>
+              ))}
+            </select>
           </div>
 
           {/* Title */}
