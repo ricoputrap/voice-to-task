@@ -2,6 +2,12 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Matoer is inspired by S.A.R.A (https://hotelservices.online/), a staff messaging system for managing day-to-day operations in hotels. Hotel staff can create new tasks and communicate with each other to coordinate guest requests, maintenance issues, and service delivery across multiple departments.
+
+S.A.R.A require manual data entry through a form for creating a new request, which can be time-consuming and inefficient during busy hotel operations.
+
+Matoer enhances the existing workflow by introducing voice-to-task conversion using AI. Staff can simply speak their requests naturally (e.g., "Room 405 needs extra pillows by 8 PM") and the system automatically transcribes the audio and extracts structured task details such as room number, category, title, assignee, and due time. This streamlines task creation, reduces manual entry errors, and improves overall efficiency in managing hotel operations.
+
 First, run the development server:
 
 ```bash
